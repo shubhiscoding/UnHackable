@@ -1,0 +1,31 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URI")
+}
+
+model User {
+  id      String          @id @default(auto()) @map("_id") @db.ObjectId
+  email   String          @unique
+  wallets WalletAddress[] // Relation to WalletAddress
+}
+
+model WalletAddress {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  address          String   @unique              // Wallet address (unique)
+  name             String                        // Name of the wallet
+  passphraseHint   String?                       // Nullable passphrase hint
+  derivationPathHint String?                     // Nullable derivation path hint
+  created          DateTime @default(now())      // Date of wallet creation
+  userId           String   @db.ObjectId         // Foreign key referencing User
+  user             User     @relation(fields: [userId], references: [id]) // Relation to User
+}

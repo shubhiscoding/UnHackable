@@ -1,14 +1,15 @@
 "use client"
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Keypair } from '@solana/web3.js'
 import * as bip39 from 'bip39'
-import { derivePath } from 'ed25519-hd-key'
-import { Button } from "@/components/ui/button"
+import { Button } from '@/components/ui/button'
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { useSession, signIn, signOut } from "next-auth/react"
 import { Shield, Lock, Key, Eye, EyeOff, Wallet, RefreshCw } from 'lucide-react'
+import { derivePath } from '@/lib/utils'
+import { signIn, useSession } from 'next-auth/react'
+import { createUser, createWallet, getUser } from '@/lib/dbOperations'
 
 export default function SolanaKeypairGenerator() {
   const [passphrase, setPassphrase] = useState('')
@@ -20,33 +21,105 @@ export default function SolanaKeypairGenerator() {
   const [seedPhrase, setSeedPhrase] = useState('')
   const [error, setError] = useState('')
   const [showPassphrase, setShowPassphrase] = useState(false)
-  const { data: session } = useSession()
   const [isGenerating, setIsGenerating] = useState(false)
+  const session = useSession();
 
-  const generateKeypair = async (e) => {
+  const generateKeypair = async (e: { preventDefault: () => void }) => {
     e.preventDefault()
     setError('')
     setPublicKey('')
     setIsGenerating(true)
-
     try {
       const mem = bip39.generateMnemonic()
-      console.log(mem)
       const seed = await bip39.mnemonicToSeed(mem, passphrase)
-      console.log(mem)
-      console.log(seed)
-      const derivedSeed = derivePath(derivationPath, seed.toString('hex')).key
+
+      const { isValid, error } = validateDerivationPath(derivationPath, seed);
+
+      if(error){
+        console.log(error);
+      }else{
+        console.log('valid');
+      }
+      const derivedSeed = derivePath(derivationPath, seed.toString('hex')).data.key
+      
       const keypair = Keypair.fromSeed(Uint8Array.from(derivedSeed))
+
       setPublicKey(keypair.publicKey.toString())
       setPrivateKey(Buffer.from(keypair.secretKey).toString('hex'))
       setSeedPhrase(mem);
-    } catch (err) {
+
+      //Saving Hints
+        if(session){
+          const email = session.data?.user?.email;
+          const wallet = await fetch('/api/hints', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email, address: keypair.publicKey.toString(), passphraseHint, derivationPathHint, name: 'Solana' })
+          });
+          const walletData = await wallet.json();
+          console.log(walletData);
+        }
+
+    } catch (err:any) {
       console.log(err);
       setError('Error generating keypair. Please check your inputs.')
+      if(err.message.includes('Invalid derivation path')) {
+        setError('Invalid derivation path. Please check your inputs.')
+      }
     } finally {
       setIsGenerating(false)
     }
   }
+
+function validateDerivationPath(derivationPath:string, seed: Buffer) {
+  try {
+    derivePath(derivationPath, seed.toString('hex')).data.key;
+    return { isValid: true };
+  } catch (err: any) {
+    const message = parseDerivationPathError(derivationPath, err.message);
+    return { isValid: false, error: message };
+  }
+}
+
+function parseDerivationPathError(path:string, error:string) {
+  if (!path) {
+    return 'The derivation path is empty.';
+  }
+
+  if (!path.includes('/')) {
+    return "The derivation path must use '/' as separators between levels.";
+  }
+
+  const segments = path.split('/');
+
+  if(segments[segments.length - 1] === ''){
+    return 'The derivation path must not end with a slash.';
+  }
+
+  if(segments[0] === ''){
+    return 'The derivation path must not start with a slash.';
+  }
+
+  for (const segment of segments) {
+    if (segment !== '') {
+      return `The derivation path must not contain empty segments.`;
+    }
+  }
+
+  for (const segment of segments) {
+    if (!/^\d+'?$/.test(segment) && segment !== '') {
+      return `Invalid segment '${segment}'. Each segment must be numeric, optionally followed by a single quote (e.g., "44'").`;
+    }
+  }
+
+  if (!error.includes('Invalid')) {
+    return `Invalid derivation path: ${error}`;
+  }
+  return `The derivation path '${path}' is invalid. Please ensure the format and levels are correct.`;
+}
+
 
   return (
     <div className="max-w-6xl mx-auto bg-white/80 rounded-2xl shadow-xl p-4 mt-12">
@@ -70,11 +143,7 @@ export default function SolanaKeypairGenerator() {
         <CardContent className="relative space-y-6 p-6">
           <form onSubmit={generateKeypair} className="space-y-2">
             <div className="space-y-4">
-              {/* <Label className="text-black/50 flex items-center gap-2 text-sm">
-                <Lock className="w-4 h-4" /> BIP39 Mnemonic Passphrase
-              </Label> */}
               <div className="relative group">
-                {/* <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg blur opacity-30 group-hover:opacity-50 transition" /> */}
                 <div className="relative">
                   <Input
                     type={showPassphrase ? "text" : "password"}
@@ -94,22 +163,17 @@ export default function SolanaKeypairGenerator() {
               </div>
 
               <div className="space-y-4">
-                {/* <Label className="text-black/50 flex items-center gap-2 text-sm">
-                  <Key className="w-4 h-4" /> Derivation Path
-                </Label> */}
                 <div className="relative group">
-                  {/* <div className="absolute -inset-0.5 rounded-lg blur opacity-30 group-hover:opacity-50 transition" /> */}
                   <Input
                     type='text'
                     value={derivationPath}
                     onChange={(e) => setDerivationPath(e.target.value)}
                     className="border-black/20 text-black/55 placeholder-black pr-10 rounded-xl"
-                    placeholder="m/44'/501'/0'/0'"
+                    placeholder="Enter Derivation Path(e.g. m/44'/501'/0'/0')"
                   />
                 </div>
               </div>
             </div>
-            {/* w-full bg-black hover:bg-black/80 text-white backdrop-blur-sm transition-all duration-200 rounded-full */}
             <Button 
               type="submit"
               disabled={isGenerating}
@@ -159,15 +223,39 @@ export default function SolanaKeypairGenerator() {
               Sign in to Save Hints
             </Button>
           ) : (
-            <div className="w-full flex items-center justify-between gap-4 text-gray-400">
-              <span>Signed in as {session.user?.email}</span>
-              <Button
-                onClick={() => signOut()}
-                variant="ghost"
-                className="text-gray-400 hover:text-white"
-              >
-                Sign Out
-              </Button>
+            <div className="w-full flex-col space-y-3 items-center justify-between gap-4 text-gray-400">
+              <div className="relative w-full">
+                <Input
+                  type={showPassphrase ? "text" : "password"}
+                  value={passphraseHint}
+                  onChange={(e) => setPassphraseHint(e.target.value)}
+                  className="border-black/20 text-black placeholder-black pr-10 rounded-xl"
+                  placeholder="Save Hint For Secure Passphrase"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassphrase(!showPassphrase)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 hover:text-gray-400"
+                >
+                  {showPassphrase ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+              <div className="relative w-full">
+                <Input
+                  type={showPassphrase ? "text" : "password"}
+                  value={derivationPathHint}
+                  onChange={(e) => setDerivationPathHint(e.target.value)}
+                  className="border-black/20 text-black placeholder-black pr-10 rounded-xl"
+                  placeholder="Save Hint For derivation Path!"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassphrase(!showPassphrase)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 hover:text-gray-400"
+                >
+                  {showPassphrase ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
             </div>
           )}
         </CardFooter>
