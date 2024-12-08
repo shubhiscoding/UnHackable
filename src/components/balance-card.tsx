@@ -19,7 +19,7 @@ interface BalanceCardProps {
 
 export default function BalanceCard(prop: BalanceCardProps) {
   const { walletName, walletAddress, createdAt } = prop;
-  const connection = new Connection(clusterApiUrl('mainnet-beta'));
+  const connection = new Connection(process.env.NEXT_PUBLIC_RPC_URL || clusterApiUrl('mainnet-beta'));
   const [balance, setBalance] = useState(0);
 
   useEffect(() => {
