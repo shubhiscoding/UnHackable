@@ -1,7 +1,7 @@
 "use client"
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Shield } from 'lucide-react'
+import { LockIcon, Shield } from 'lucide-react'
 import { Sun } from 'lucide-react'
 import { signIn, signOut, useSession } from 'next-auth/react'
 interface navBarProps{
@@ -26,7 +26,9 @@ export default function Navbar(navBarProps: navBarProps) {
     <div className='flex justify-center relative z-10'>
       <nav className="fixed flex items-center justify-between px-2 py-2 bg-black text-white rounded-full w-auto top-2 self-center">
         <div className="flex items-center space-x-2 ml-1">
-          <Sun className="w-6 h-6 text-orange-500" />
+          <div className="flex justify-center items-center p-[0.4rem] w-8 h-8 bg-zinc-800 rounded-full overflow-hidden">
+            <LockIcon className="w-6 h-6" />
+          </div>
           <span className="font-semibold">UnHackable</span>
         </div>
         <div className="flex space-x-8 mx-6">

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { HardHat, RefreshCcw, CircleDollarSign, Menu, PieChart, X, HelpCircleIcon, Wallet } from 'lucide-react'
+import { HardHat, RefreshCcw, CircleDollarSign, Menu, PieChart, X, HelpCircleIcon, Wallet, LockIcon } from 'lucide-react'
 import { IconBrandGithub, IconBrandLinkedin, IconBrandTwitter } from '@tabler/icons-react'
 
 const MenuItem = ({ icon: Icon, label, isActive = false, onClick, isCollapsed }: { 
@@ -68,8 +68,8 @@ export default function CustomSidebar(props: CustomSidebarProps) {
             <div className="flex items-center w-full">
               {isOpen ? (
                 <>
-                  <div className="w-8 h-8 mr-3 bg-zinc-800 rounded-full overflow-hidden">
-                    <img src="/placeholder.svg" alt="Profile" className="w-full h-full object-cover" />
+                  <div className="flex justify-center items-center p-[0.4rem] w-8 h-8 mr-2 bg-zinc-800 rounded-full overflow-hidden">
+                    <LockIcon className="w-6 h-6" />
                   </div>
                   <div className="flex-1 text-left">
                     <p className="text-xl font-bold text-zinc-100">UnHackable</p>

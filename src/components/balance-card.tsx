@@ -14,7 +14,7 @@ import { useEffect, useState } from 'react'
 interface BalanceCardProps {
   walletName: string
   walletAddress: string
-  createdAt: Date
+  createdAt: string
 }
 
 export default function BalanceCard(prop: BalanceCardProps) {

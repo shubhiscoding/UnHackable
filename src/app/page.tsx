@@ -4,8 +4,6 @@ import React from 'react'
 import { useState } from 'react'
 import Navbar from '../components/NavBar'
 import IntroSection from '../components/Intro'
-import SolanaKeypairGenerator from '../components/SolanaKeypairGenerator'
-import RecoverPrivateKey from '../components/RecoverPrivateKey'
 import { BackgroundBeams } from '@/components/ui/background-beams'
 
 import GenerateKeypairForm from "@/components/generate-keypair";

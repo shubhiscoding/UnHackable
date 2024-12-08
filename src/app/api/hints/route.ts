@@ -1,6 +1,7 @@
 import { createUser, createWallet, getUser, getWallet, getWallets } from "@/lib/dbOperations";
 import { NextResponse } from "next/server";
-export async function POST(req: Request, res: NextResponse){
+
+export async function POST(req: Request) {
     const { email, address, passphraseHint, derivationPathHint, name } = await req.json();
 
     if (!email || !address) {
@@ -19,10 +20,9 @@ export async function POST(req: Request, res: NextResponse){
     }
 
     return NextResponse.json(newWallet, { status: 201 });
-};
+}
 
-
-export async function GET(req: Request, res: NextResponse){
+export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const address = searchParams.get('address');
     if (!address) {
@@ -36,4 +36,4 @@ export async function GET(req: Request, res: NextResponse){
     }
 
     return NextResponse.json(wallet, { status: 200 });
-};
+}

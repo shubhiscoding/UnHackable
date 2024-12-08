@@ -1,7 +1,7 @@
 import { getUser, getWallets } from "@/lib/dbOperations";
 import { NextResponse } from "next/server";
 
-export async function POST(req: Request, res: NextResponse){
+export async function POST(req: Request){
     const { email } = await req.json();
 
     if (!email) {

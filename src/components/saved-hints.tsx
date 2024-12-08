@@ -5,7 +5,15 @@ import { Button } from "@/components/ui/button"
 
 interface SavedHintsProps {
   title: string,
-  Hint: Array<{}>,
+  Hint: Array<{
+          address: string;
+          id: string;
+          name: string;
+          passphraseHint: string | null;
+          derivationPathHint: string | null;
+          created: Date;
+          userId: string;
+      }>,
   publicKey: string,
   setPublicKey: (publicKey: string) => void
 }
