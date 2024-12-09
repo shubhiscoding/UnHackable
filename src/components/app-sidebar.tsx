@@ -49,6 +49,9 @@ export default function CustomSidebar(props: CustomSidebarProps) {
   const toggleSidebar = () => setIsOpen(!isOpen)
   const onClick = (name: string) =>{
     props.setTitle(name);
+    if(window.innerWidth < 768){
+      toggleSidebar();
+    }
   }
 
   return (
@@ -60,6 +63,9 @@ export default function CustomSidebar(props: CustomSidebarProps) {
           bg-black text-zinc-400 
           transform transition-all duration-300 ease-in-out 
           md:translate-x-0
+          max-md:z-20
+          max-md:fixed
+          ${!isOpen && "max-md:h-fit"}
         `}
       >
         <div className="flex flex-col h-full">
@@ -93,7 +99,7 @@ export default function CustomSidebar(props: CustomSidebarProps) {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 overflow-y-auto py-4">
+          <nav className={`flex-1 overflow-y-auto py-4 ${!isOpen && "max-md:hidden"}`}>
             <MenuGroup isCollapsed={!isOpen}>
               <MenuItem 
                 icon={HardHat} 
@@ -119,7 +125,7 @@ export default function CustomSidebar(props: CustomSidebarProps) {
               <MenuItem 
                 icon={PieChart} 
                 isActive={props.title == "Protfolio"? true: false}
-                label="Portfolio" 
+                label="Protfolio" 
                 isCollapsed={!isOpen}
                 onClick={() => onClick("Protfolio")}
               />
