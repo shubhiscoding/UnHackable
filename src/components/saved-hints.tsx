@@ -59,7 +59,7 @@ export default function SavedHints(prop: SavedHintsProps) {
               </span>
               <Button
                 variant="ghost"
-                size="xl"
+                size="sm"
                 className="w-full xl:w-auto h-7 bg-zinc-800 text-xs font-medium text-zinc-100 hover:bg-zinc-700 hover:text-zinc-50"
                 onClick={() => setPublicKey(hint.address)}
               >
