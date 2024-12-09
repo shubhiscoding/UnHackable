@@ -75,15 +75,15 @@ const Dashboard = () => {
                             title == "Protfolio" ?(
                                 <div className="flex h-min p-6 justify-evenly gap-5">
                                     <Card className="flex w-max bg-zinc-900 text-zinc-100 border-0 p-6 justify-evenly gap-5">
-                                        Comming Soon!
+                                        Coming Soon!
                                     </Card>
                                 </div>
                             ):<></>
                         }
                         {
                             title == "Support UnHackable" ?(
-                                <div className="flex h-min p-6 justify-evenly gap-5">
-                                    <Card className="flex w-max bg-zinc-900 text-zinc-100 border-0 p-6 justify-evenly gap-5">
+                                <div className="flex h-min w-full p-6 justify-evenly gap-5">
+                                    <Card className="flex max-w-fit w-full bg-zinc-900 text-zinc-100 border-0 p-6 justify-evenly gap-5">
                                         If you find UnHackables useful, please consider supporting the project by donating to the following address:
                                         8vG8mxWEn8bmpBxh2QAEjoL2wUWbUSsyRqMx82zKKNMq
                                     </Card>

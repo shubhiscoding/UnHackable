@@ -26,12 +26,12 @@ export default function Home() {
             <h1 className="text-lg md:text-7xl  bg-clip-text text-transparent bg-gradient-to-b from-neutral-200 to-neutral-600  text-center font-sans font-bold mt-12 mb-2">
               {mode}
             </h1>
-            <div className='relative z-10 flex justify-center items-center w-1/3'>
+            <div className='relative z-10 flex justify-center items-center w-full max-w-3xl'>
             {mode =="Recover PrivateKey" && <RecoverPrivateKeyForm/>}
             {mode =="Generate KeyPair" && <GenerateKeypairForm publicKey={publicKey} setPublicKey={setPublicKey} guestUser={true}/>}
             {mode =="Support UnHackable"&&
-              <div className="flex h-min p-6 justify-evenly gap-5">
-                  <Card className="flex w-max bg-zinc-900 text-zinc-100 border-0 p-6 justify-evenly gap-5">
+              <div className="flex h-min w-screen p-6 justify-evenly gap-5">
+                  <Card className="flex max-w-fit w-screen bg-zinc-900 text-zinc-100 border-0 p-6 justify-evenly gap-5">
                       If you find UnHackables useful, please consider supporting the project by donating to the following address:
                       8vG8mxWEn8bmpBxh2QAEjoL2wUWbUSsyRqMx82zKKNMq
                   </Card>

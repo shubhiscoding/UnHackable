@@ -119,7 +119,7 @@ export default function CustomSidebar(props: CustomSidebarProps) {
               <MenuItem 
                 icon={PieChart} 
                 isActive={props.title == "Protfolio"? true: false}
-                label="Protfolio" 
+                label="Portfolio" 
                 isCollapsed={!isOpen}
                 onClick={() => onClick("Protfolio")}
               />

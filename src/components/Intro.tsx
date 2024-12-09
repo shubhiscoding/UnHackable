@@ -35,7 +35,7 @@ const IntroSection = (prop: IntroSectionProps) =>{
                 <br />
                 For Your Private Key
                 </h1>
-                <p className="text-zinc-400 text-lg mb-2 max-w-2xl mx-auto">
+                <p className="bg-clip-text text-transparent bg-gradient-to-b from-neutral-300 to-neutral-500 text-lg mt-8 mb-2 max-w-2xl mx-auto">
                 Add extra layer of security to your wallet by adding a passphrase and derivation path to your private key.
                 </p>
                 <button className="rounded-full bg-zinc-800 px-2 py-1 text-left transition-colors hover:bg-zinc-800 mb-8">
