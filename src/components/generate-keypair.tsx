@@ -155,7 +155,7 @@ export default function GenerateKeypairForm(prop: GenerateKeypairFormProps) {
         <CardTitle className="text-lg font-medium">Generate KeyPair</CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6 pt-6">
+        <form onSubmit={handleSubmit} className="space-y-4 pt-6">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2 relative">
               <Label htmlFor="passphrase">Passphrase</Label>

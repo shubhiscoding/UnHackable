@@ -56,7 +56,7 @@ export default function RecoverPrivateKeyForm() {
         <CardTitle className="text-lg font-medium">Recover Private Key</CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6 pt-6">
+        <form onSubmit={handleSubmit} className="space-y-4 pt-6">
           <div className="space-y-2">
             <Label htmlFor="passphrase">Enter Passphrase</Label>
             <Input

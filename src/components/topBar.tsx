@@ -13,9 +13,9 @@ export default function TopBar(Req: TopBarProps) {
   const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
 
   return (
-    <div className="flex w-full items-center bg-black text-white px-4 h-20 relative">
+    <div className="flex w-full items-center bg-black text-white px-4 h-20 relative max-md:fixed max-md:z-10">
       <div className="flex justify-between w-full">
-        <h1 className="font-semibold text-xl">{Req.title}</h1>
+        <h1 className="font-semibold text-xl max-md:ml-16">{Req.title}</h1>
         <div className="relative">
           <Image
             className="rounded-full cursor-pointer"
