@@ -88,7 +88,7 @@ const Dashboard = () => {
                                       If you find UnHackables useful, please consider supporting the project by donating to the following address:
                                     </div>
                                     <div className="text-xs md:text-xl break-all">
-                                      8vG8mxWEn8bmpBxh2QAEjoL2wUWbUSsyRqMx82zKKNMq
+                                      EZWrterFqrNPJHfhtKizkMRGDLcDQsDALxBp8BikFW9r
                                     </div>
                                   </Card>
                                 </div>

@@ -1,6 +1,6 @@
 "use client"
 import { useState } from 'react'
-import { Key, RefreshCw } from 'lucide-react'
+import { Eye, EyeOff, Key, RefreshCw } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -57,16 +57,23 @@ export default function RecoverPrivateKeyForm() {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4 pt-6">
-          <div className="space-y-2">
+          <div className="space-y-2 relative">
             <Label htmlFor="passphrase">Enter Passphrase</Label>
             <Input
               id="passphrase"
-              type="password"
+              type={showPassphrase ? 'text' : 'password'}
               placeholder="Enter your passphrase"
               value={passphrase}
               onChange={(e) => setPassphrase(e.target.value)}
               className="bg-zinc-800 border-zinc-700 text-zinc-100 placeholder:text-zinc-400"
             />
+            <button
+              type="button"
+              onClick={() => setShowPassphrase(!showPassphrase)}
+              className="absolute inset-y-10 right-0 pr-3 flex items-center text-gray-600 hover:text-gray-400"
+            >
+              {showPassphrase ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+            </button>
           </div>
           <div className="space-y-2">
             <Label htmlFor="derivationPath">Enter Derivation Path</Label>
@@ -128,7 +135,7 @@ export default function RecoverPrivateKeyForm() {
       </CardContent>
       <CardFooter className="justify-center">
         <p className="text-xs text-zinc-500">
-          Support this project: 8vG8mxWEn8bmpBxh2QAEjoL2wUWbUSsyRqMx82zKKNMq
+          Support this project: EZWrterFqrNPJHfhtKizkMRGDLcDQsDALxBp8BikFW9r
         </p>
       </CardFooter>
     </Card>
