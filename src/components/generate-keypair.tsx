@@ -262,7 +262,7 @@ export default function GenerateKeypairForm(prop: GenerateKeypairFormProps) {
       </CardContent>
       <CardFooter className="justify-center">
         <p className="text-xs text-zinc-500">
-          Support this project: EZWrterFqrNPJHfhtKizkMRGDLcDQsDALxBp8BikFW9r
+          Support this project: 8twrkXxvDzuUezvbkgg3LxpTEZ59KiFx2VxPFDkucLk3
         </p>
       </CardFooter>
     </Card>
