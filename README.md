@@ -30,3 +30,5 @@ bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+<!-- GitAds-Verify: DT98EHXVE6E5DCZH6VAECCPN2BGFALLK -->
