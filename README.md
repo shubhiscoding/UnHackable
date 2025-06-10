@@ -32,3 +32,7 @@ bun dev
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 <!-- GitAds-Verify: DT98EHXVE6E5DCZH6VAECCPN2BGFALLK -->
+## GitAds Sponsored
+[![Sponsored by GitAds](https://gitads.dev/v1/ad-serve?source=shubhiscoding/unhackable@github)](https://gitads.dev/v1/ad-track?source=shubhiscoding/unhackable@github)
+
+
