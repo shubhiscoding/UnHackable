@@ -42,34 +42,38 @@ jobs:
         with:
           version: 'v1.28.0'
 
-      # For demo: Show what would be deployed
-      - name: Show deployment configuration
+      - name: Configure kubeconfig
         run: |
-          echo "📦 Deploying image: ${{ env.IMAGE_NAME }}:latest"
-          echo ""
-          echo "=== Deployment Manifest ==="
-          sed "s|IMAGE_PLACEHOLDER|${{ env.IMAGE_NAME }}:latest|g" k8s/deployment.yaml
-          echo ""
-          echo "=== Service Manifest ==="
-          cat k8s/service.yaml
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
 
-      # NOTE: In production, you would configure KUBE_CONFIG secret and run:
-      # - name: Configure kubeconfig
-      #   run: |
-      #     mkdir -p $HOME/.kube
-      #     echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
-      #
-      # - name: Deploy to Kubernetes
-      #   run: |
-      #     sed -i "s|IMAGE_PLACEHOLDER|${{ env.IMAGE_NAME }}:latest|g" k8s/deployment.yaml
-      #     kubectl apply -f k8s/deployment.yaml -n staging
-      #     kubectl apply -f k8s/service.yaml -n staging
-      #     kubectl rollout status deployment/unhackable -n staging
+      - name: Create namespace if not exists
+        run: kubectl create namespace staging --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Create/Update secrets
+        run: |
+          kubectl create secret generic unhackable-secrets \
+            --from-literal=DATABASE_URI="${{ secrets.DATABASE_URI }}" \
+            --from-literal=NEXT_PUBLIC_RPC_URL="${{ secrets.NEXT_PUBLIC_RPC_URL }}" \
+            --from-literal=GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" \
+            --from-literal=GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}" \
+            --from-literal=AUTH_SECRET="${{ secrets.AUTH_SECRET }}" \
+            --from-literal=NEXTAUTH_URL="${{ secrets.STAGING_URL }}" \
+            -n staging --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Deploy to Kubernetes
+        run: |
+          sed -i "s|IMAGE_PLACEHOLDER|${{ env.IMAGE_NAME }}:${{ github.sha }}|g" k8s/deployment.yaml
+          kubectl apply -f k8s/deployment.yaml -n staging
+          kubectl apply -f k8s/service.yaml -n staging
+
+      - name: Wait for rollout
+        run: kubectl rollout status deployment/unhackable -n staging --timeout=300s
 
       - name: Deployment ready
         run: |
-          echo "✅ Staging deployment manifests validated!"
-          echo "📝 To deploy to a real cluster, configure KUBE_CONFIG secret"
+          echo "✅ Staging deployment complete!"
+          kubectl get pods -n staging -l app=unhackable
 
   # ============================================
   # Stage 2: DAST - Dynamic Application Security Testing
@@ -135,18 +139,45 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Production deployment info
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.28.0'
+
+      - name: Configure kubeconfig
         run: |
-          echo "🚀 Production Deployment"
-          echo "========================"
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
+
+      - name: Create namespace if not exists
+        run: kubectl create namespace production --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Create/Update secrets
+        run: |
+          kubectl create secret generic unhackable-secrets \
+            --from-literal=DATABASE_URI="${{ secrets.DATABASE_URI }}" \
+            --from-literal=NEXT_PUBLIC_RPC_URL="${{ secrets.NEXT_PUBLIC_RPC_URL }}" \
+            --from-literal=GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" \
+            --from-literal=GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}" \
+            --from-literal=AUTH_SECRET="${{ secrets.AUTH_SECRET }}" \
+            --from-literal=NEXTAUTH_URL="${{ secrets.PRODUCTION_URL }}" \
+            -n production --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Deploy to Kubernetes
+        run: |
+          sed -i "s|IMAGE_PLACEHOLDER|${{ env.IMAGE_NAME }}:${{ github.sha }}|g" k8s/deployment.yaml
+          kubectl apply -f k8s/deployment.yaml -n production
+          kubectl apply -f k8s/service.yaml -n production
+
+      - name: Wait for rollout
+        run: kubectl rollout status deployment/unhackable -n production --timeout=300s
+
+      - name: Verify deployment
+        run: |
+          echo "✅ Production deployment complete!"
           echo ""
-          echo "Image: ${{ env.IMAGE_NAME }}:latest"
-          echo "Commit: ${{ github.sha }}"
+          echo "📦 Image: ${{ env.IMAGE_NAME }}:${{ github.sha }}"
+          echo "🔗 Commit: ${{ github.sha }}"
           echo ""
-          echo "In a real setup, this would:"
-          echo "1. Connect to production Kubernetes cluster"
-          echo "2. Apply deployment manifests"
-          echo "3. Perform rolling update"
-          echo "4. Verify deployment health"
-          echo ""
-          echo "✅ Production deployment pipeline validated!"
+          kubectl get pods -n production -l app=unhackable
+          kubectl get svc -n production -l app=unhackable

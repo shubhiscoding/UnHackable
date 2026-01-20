@@ -17,6 +17,7 @@ spec:
       containers:
         - name: unhackable
           image: IMAGE_PLACEHOLDER
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
           envFrom:
