@@ -88,7 +88,14 @@ jobs:
       - name: Start application for DAST
         run: |
           docker pull ${{ env.IMAGE_NAME }}:latest || echo "Using local build"
-          docker run -d --name dast-target -p 3000:3000 ${{ env.IMAGE_NAME }}:latest || \
+          docker run -d --name dast-target -p 3000:3000 \
+            -e DATABASE_URI="${{ secrets.DATABASE_URI }}" \
+            -e NEXT_PUBLIC_RPC_URL="${{ secrets.NEXT_PUBLIC_RPC_URL }}" \
+            -e GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" \
+            -e GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}" \
+            -e AUTH_SECRET="${{ secrets.AUTH_SECRET }}" \
+            -e NEXTAUTH_URL="http://localhost:3000" \
+            ${{ env.IMAGE_NAME }}:latest || \
             echo "⚠️ Could not pull image, skipping DAST"
           sleep 15
 
