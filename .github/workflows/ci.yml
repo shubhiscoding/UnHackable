@@ -17,7 +17,7 @@ jobs:
   #      catches syntax errors early before expensive operations
   # ============================================
   lint:
-    name: 🔍 Lint & Type Check
+    name: Lint & Type Check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -44,7 +44,7 @@ jobs:
   #      ensures code behaves as expected
   # ============================================
   test:
-    name: 🧪 Unit Tests
+    name: Unit Tests
     runs-on: ubuntu-latest
     needs: lint
     steps:
@@ -69,7 +69,7 @@ jobs:
   #      implements shift-left security before deployment
   # ============================================
   sast:
-    name: 🔐 SAST - CodeQL Analysis
+    name: SAST - CodeQL Analysis
     runs-on: ubuntu-latest
     needs: lint
     permissions:
@@ -100,7 +100,7 @@ jobs:
   #      checks for known CVEs in npm packages
   # ============================================
   sca:
-    name: 📦 SCA - Dependency Check
+    name: SCA - Dependency Check
     runs-on: ubuntu-latest
     needs: lint
     steps:
@@ -125,7 +125,7 @@ jobs:
   #      creates production-ready artifacts
   # ============================================
   build:
-    name: 🏗️ Build Application
+    name: Build Application
     runs-on: ubuntu-latest
     needs: [test, sast, sca]
     steps:
@@ -150,7 +150,7 @@ jobs:
   #      OS & library vulnerabilities before shipping
   # ============================================
   docker:
-    name: 🐳 Docker Build & Scan
+    name: Docker Build & Scan
     runs-on: ubuntu-latest
     needs: build
     steps:
@@ -201,7 +201,7 @@ jobs:
   #      enables downstream CD pipeline deployment
   # ============================================
   push:
-    name: 📤 Push to DockerHub
+    name: Push to DockerHub
     runs-on: ubuntu-latest
     needs: docker
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
@@ -232,5 +232,5 @@ jobs:
 
       - name: Image pushed successfully
         run: |
-          echo "✅ Image pushed to DockerHub!"
-          echo "📦 Tags: latest, ${{ github.sha }}"
+          echo "Image pushed to DockerHub!"
+          echo "Tags: latest, ${{ github.sha }}"
