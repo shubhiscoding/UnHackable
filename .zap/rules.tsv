@@ -1,0 +1,16 @@
+# OWASP ZAP Scan Rules Configuration
+# Format: rule_id	action	description
+# Actions: IGNORE, WARN, FAIL
+
+# Informational alerts - Ignore
+10021	IGNORE	X-Content-Type-Options Header Missing
+10036	IGNORE	Server Leaks Version Information
+10037	IGNORE	Server Leaks Information via X-Powered-By
+
+# Low risk - Warn only
+10035	WARN	Strict-Transport-Security Header Not Set
+10038	WARN	Content Security Policy Header Not Set
+
+# Medium/High - Will cause warnings but not fail build for demo
+10012	WARN	Password Autocomplete in Browser
+90011	WARN	Charset Mismatch
