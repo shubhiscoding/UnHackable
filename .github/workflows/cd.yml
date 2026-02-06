@@ -24,6 +24,73 @@ env:
 
 jobs:
   # ============================================
+  # Stage 0: Deploy to Local Kubernetes
+  # WHY: Automatic deployment to local development cluster
+  #      via self-hosted runner for quick iteration
+  # ============================================
+  deploy-local:
+    name: 🏠 Deploy to Local Kubernetes
+    runs-on: [self-hosted, local-k8s]
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Verify kubectl access
+        run: |
+          kubectl version --client
+          kubectl cluster-info
+          kubectl config current-context
+
+      - name: Build Docker image locally
+        run: |
+          echo "Building Docker image: unhackable:${{ github.sha }}"
+          docker build -t unhackable:${{ github.sha }} -f dockerfile .
+          docker tag unhackable:${{ github.sha }} unhackable:latest
+
+      - name: Create namespace
+        run: kubectl create namespace local --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Create/Update secrets
+        run: |
+          if [ -f ".env.local" ]; then
+            export $(cat .env.local | grep -v '^#' | xargs)
+          fi
+          kubectl create secret generic unhackable-secrets \
+            --from-literal=DATABASE_URI="${DATABASE_URI:-mongodb://demo:demo@localhost:27017/unhackable}" \
+            --from-literal=NEXT_PUBLIC_RPC_URL="${NEXT_PUBLIC_RPC_URL:-https://demo-rpc.example.com}" \
+            --from-literal=GOOGLE_CLIENT_ID="${GOOGLE_CLIENT_ID:-demo-client-id}" \
+            --from-literal=GOOGLE_CLIENT_SECRET="${GOOGLE_CLIENT_SECRET:-demo-secret}" \
+            --from-literal=AUTH_SECRET="${AUTH_SECRET:-demo-auth-secret-$(openssl rand -hex 16)}" \
+            --from-literal=NEXTAUTH_URL="${NEXTAUTH_URL:-http://localhost:3000}" \
+            -n local --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Deploy to Kubernetes
+        run: |
+          sed "s|IMAGE_PLACEHOLDER|unhackable:${{ github.sha }}|g" k8s/deployment.yaml | \
+          sed 's|imagePullPolicy: IfNotPresent|imagePullPolicy: Never|g' > /tmp/deployment-local.yaml
+          kubectl apply -f /tmp/deployment-local.yaml -n local
+          kubectl apply -f k8s/service.yaml -n local
+
+      - name: Wait for rollout
+        run: kubectl rollout status deployment/unhackable -n local --timeout=300s
+
+      - name: Display deployment info
+        run: |
+          echo "✅ Local deployment complete!"
+          echo ""
+          kubectl get pods -n local -l app=unhackable
+          echo ""
+          kubectl get svc -n local -l app=unhackable
+          echo ""
+          echo "🔗 Access: http://localhost"
+
+  # ============================================
+  # Stage 1: Deploy to Staging (Kubernetes)
+  # WHY: Validates deployment in non-production environment,
+  #      allows testing before production release
+  # ============================================
+  # ============================================
   # Stage 1: Deploy to Staging (Kubernetes)
   # WHY: Validates deployment in non-production environment,
   #      allows testing before production release
